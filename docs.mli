@@ -23,5 +23,6 @@ rt-prober := ({
     logger?: WinstonLoggerClient,
     backend: EventEmitter,
     failureEvent: String,
-    successEvent: String
+    successEvent: String,
+    failureHandler: ({ subject: String, body: String }) => void
 }) => Prober

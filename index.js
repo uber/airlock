@@ -13,6 +13,7 @@ function Prober(options) {
     this.detectFailuresByCallback = detectFailuresBy === Prober.detectBy.CALLBACK || detectFailuresBy === Prober.detectBy.BOTH;
     this.detectFailuresByEvent = detectFailuresBy === Prober.detectBy.EVENT || detectFailuresBy === Prober.detectBy.BOTH;
 
+    this.failureHandler = options.failureHandler;
     this.logger = options.logger || null;
     this.probes = [];
     this.waitPeriod = this.defaultWaitPeriod;
@@ -93,11 +94,11 @@ Prober.prototype.probe = function probe(request, bypass, callback) {
         try {
             request(wrappedCallback);
         } catch (e) {
-            // The FailMailer is used here instead of the logger because
-            // the logger itself uses the Prober and may have caused the
-            // exception in the first place
-            // if (!this.failMailer) this.failMailer = new FailMailer();
-            this.failMailer.send({
+            // we can't log the error here in case the prober is used
+            // within the loger. So instead we pass it to the failureHandler
+            // the user of this module should not log in the failureHandler
+            // maybe send an email instead
+            this.failureHandler({
                 subject: "Exception in Prober while probing " + this.title,
                 body: e.stack
             });
