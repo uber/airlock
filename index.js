@@ -13,6 +13,7 @@ function Prober(options) {
     this.detectFailuresByCallback = detectFailuresBy === Prober.detectBy.CALLBACK || detectFailuresBy === Prober.detectBy.BOTH;
     this.detectFailuresByEvent = detectFailuresBy === Prober.detectBy.EVENT || detectFailuresBy === Prober.detectBy.BOTH;
 
+    this.logger = options.logger || null;
     this.probes = [];
     this.waitPeriod = this.defaultWaitPeriod;
     this.lastBackendRequest = Date.now();
@@ -20,7 +21,10 @@ function Prober(options) {
 
     if (this.detectFailuresByEvent) {
         if (!options.backend) {
-            // logger.warn("Prober missing backend from initialization options");
+            if (this.logger) {
+                this.logger.warn('Prober missing backend from' +
+                    ' initialization options');
+            }
             return;
         }
 
@@ -53,6 +57,10 @@ Prober.prototype.notOk = Prober.prototype.notok;
 Prober.prototype.ok = function ok() {
     this._addProbe(true);
     this.statsd.increment('prober.' + this.title + '.probe.ok');
+};
+
+Prober.prototype.setLogger = function setLogger(logger) {
+    this.logger = logger;
 };
 
 Prober.prototype.probe = function probe(request, bypass, callback) {
