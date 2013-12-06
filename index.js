@@ -116,6 +116,7 @@ Prober.prototype.probe = function probe(request, bypass, callback) {
 
 Prober.prototype._addProbe = function addProbe(isOk) {
     var timestamp = Date.now();
+    var logger = this.logger;
 
     var wasHealthy = this.isHealthy();
     var thisProbe = { isOk: isOk, timestamp: timestamp };
@@ -124,27 +125,35 @@ Prober.prototype._addProbe = function addProbe(isOk) {
     var isHealthy = this.isHealthy();
 
     if (wasHealthy && !isHealthy) {
-        // logger.warn(this.title + ' has gotten sick');
+        if (logger) {
+            logger.warn(this.title + ' has gotten sick');
+        }
         this.statsd.increment('prober.' + this.title + '.health.sick');
     } else if (!wasHealthy && isHealthy) {
         this.waitPeriod = this.defaultWaitPeriod;
-        // logger.warn(this.title + ' has returned to health');
+        if (logger) {
+            logger.warn(this.title + ' has returned to health');
+        }
         this.statsd.increment('prober.' + this.title + '.health.recovered');
     } else if (!wasHealthy && !isHealthy) {
         this.statsd.increment('prober.' + this.title + '.health.still-sick');
 
         if (thisProbe.isOk) {
             this.waitPeriod /= 2;
-            // logger.warn(this.title + ' is still sick but last probe was healthy. Decreased wait period to ' + this.waitPeriod + 'ms');
+            if (logger) {
+                logger.warn(this.title + ' is still sick but last probe was healthy. Decreased wait period to ' + this.waitPeriod + 'ms');
+            }
         } else {
             this.waitPeriod *= 2;
 
             if (this.waitPeriod > this.maxWaitPeriod) {
                 this.waitPeriod = this.maxWaitPeriod;
-                // logger.warn(this.title + ' is still sick. Wait period is at its max, ' + this.waitPeriod + 'ms');
-            } // else {
-                // logger.warn(this.title + ' is still sick. Increased wait period to ' + this.waitPeriod + 'ms');
-            // }
+                if (logger) {
+                    logger.warn(this.title + ' is still sick. Wait period is at its max, ' + this.waitPeriod + 'ms');
+                }
+            } else if (logger) {
+                logger.warn(this.title + ' is still sick. Increased wait period to ' + this.waitPeriod + 'ms');
+            }
         }
     }
 };
