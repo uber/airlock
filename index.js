@@ -10,8 +10,12 @@ function Prober(options) {
     this.maxWaitPeriod = options.maxWaitPeriod || 60000;
     this.enabled = options.enabled || false;
     var detectFailuresBy = options.detectFailuresBy || Prober.detectBy.CALLBACK;
-    this.detectFailuresByCallback = detectFailuresBy === Prober.detectBy.CALLBACK || detectFailuresBy === Prober.detectBy.BOTH;
-    this.detectFailuresByEvent = detectFailuresBy === Prober.detectBy.EVENT || detectFailuresBy === Prober.detectBy.BOTH;
+    this.detectFailuresByCallback =
+        (detectFailuresBy === Prober.detectBy.CALLBACK) ||
+        (detectFailuresBy === Prober.detectBy.BOTH);
+    this.detectFailuresByEvent =
+        (detectFailuresBy === Prober.detectBy.EVENT) ||
+        (detectFailuresBy === Prober.detectBy.BOTH);
 
     this.failureHandler = options.failureHandler;
     this.logger = options.logger || null;
@@ -41,7 +45,8 @@ Prober.detectBy = {
 };
 
 Prober.prototype.isHealthy = function isHealth() {
-    return this.probes.length < this.window || this._getOks().length >= this.threshold;
+    return this.probes.length < this.window ||
+        this._getOks().length >= this.threshold;
 };
 
 Prober.prototype.isSick = function isSick() {
@@ -80,7 +85,9 @@ Prober.prototype.probe = function probe(request, bypass, callback) {
         var wrappedCallback;
         if (this.detectFailuresByCallback) {
             wrappedCallback = function(err, resp) {
-                if (err || (resp && !isNaN(resp.statusCode) && resp.statusCode >= 500)) {
+                var errResponse = resp && !isNaN(resp.statusCode) &&
+                    resp.statusCode >= 500;
+                if (err || errResponse) {
                     self.notok();
                 } else {
                     self.ok();
@@ -141,7 +148,9 @@ Prober.prototype._addProbe = function addProbe(isOk) {
         if (thisProbe.isOk) {
             this.waitPeriod /= 2;
             if (logger) {
-                logger.warn(this.title + ' is still sick but last probe was healthy. Decreased wait period to ' + this.waitPeriod + 'ms');
+                logger.warn(this.title + ' is still sick but last probe was ' +
+                    'healthy. Decreased wait period to ' +
+                    this.waitPeriod + 'ms');
             }
         } else {
             this.waitPeriod *= 2;
@@ -149,10 +158,12 @@ Prober.prototype._addProbe = function addProbe(isOk) {
             if (this.waitPeriod > this.maxWaitPeriod) {
                 this.waitPeriod = this.maxWaitPeriod;
                 if (logger) {
-                    logger.warn(this.title + ' is still sick. Wait period is at its max, ' + this.waitPeriod + 'ms');
+                    logger.warn(this.title + ' is still sick. Wait period is ' +
+                        'at its max, ' + this.waitPeriod + 'ms');
                 }
             } else if (logger) {
-                logger.warn(this.title + ' is still sick. Increased wait period to ' + this.waitPeriod + 'ms');
+                logger.warn(this.title + ' is still sick. Increased wait ' +
+                    'period to ' + this.waitPeriod + 'ms');
             }
         }
     }
@@ -163,7 +174,8 @@ Prober.prototype._getOks = function _getOks() {
 };
 
 Prober.prototype._isPityProbe = function _isPityProbe() {
-    return this.lastBackendRequest && Date.now() >= (this.lastBackendRequest + this.waitPeriod);
+    return this.lastBackendRequest && Date.now() >=
+        (this.lastBackendRequest + this.waitPeriod);
 };
 
 module.exports = Prober;
