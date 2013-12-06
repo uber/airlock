@@ -1,7 +1,3 @@
-// var logger = require('./winston_setup');
-// var Statsd = require('./statsd_wrapper');
-// var FailMailer = require('./failmailer');
-
 function Prober(options) {
     this.title = options.title || 'general';
     this.threshold = options.threshold || 3;
@@ -22,7 +18,7 @@ function Prober(options) {
     this.probes = [];
     this.waitPeriod = this.defaultWaitPeriod;
     this.lastBackendRequest = Date.now();
-    // this.statsd = Statsd.getInstance();
+    this.statsd = options.statsd || null;
 
     if (this.detectFailuresByEvent) {
         if (!options.backend) {
@@ -55,14 +51,18 @@ Prober.prototype.isSick = function isSick() {
 
 Prober.prototype.notok = function notok() {
     this._addProbe(false);
-    this.statsd.increment('prober.' + this.title + '.probe.notok');
+    if (this.statsd) {
+        this.statsd.increment('prober.' + this.title + '.probe.notok');
+    }
 };
 
 Prober.prototype.notOk = Prober.prototype.notok;
 
 Prober.prototype.ok = function ok() {
     this._addProbe(true);
-    this.statsd.increment('prober.' + this.title + '.probe.ok');
+    if (this.statsd) {
+        this.statsd.increment('prober.' + this.title + '.probe.ok');
+    }
 };
 
 Prober.prototype.setLogger = function setLogger(logger) {
@@ -80,7 +80,10 @@ Prober.prototype.probe = function probe(request, bypass, callback) {
     // that we should check to see if the backend is no longer
     // sick, then make a request to the backend.
     if (this.isHealthy() || this._isPityProbe()) {
-        this.statsd.increment('prober.' + this.title + '.request.performed');
+        if (this.statsd) {
+            this.statsd.increment('prober.' + this.title +
+                '.request.performed');
+        }
 
         var wrappedCallback;
         if (this.detectFailuresByCallback) {
@@ -113,7 +116,9 @@ Prober.prototype.probe = function probe(request, bypass, callback) {
 
         this.lastBackendRequest = Date.now();
     } else {
-        this.statsd.increment('prober.' + this.title + '.request.bypassed');
+        if (this.statsd) {
+            this.statsd.increment('prober.' + this.title + '.request.bypassed');
+        }
 
         if (bypass && typeof bypass === 'function') {
             bypass(new Error(this.title + ' backend is unhealthy'));
@@ -124,6 +129,7 @@ Prober.prototype.probe = function probe(request, bypass, callback) {
 Prober.prototype._addProbe = function addProbe(isOk) {
     var timestamp = Date.now();
     var logger = this.logger;
+    var statsd = this.statsd;
 
     var wasHealthy = this.isHealthy();
     var thisProbe = { isOk: isOk, timestamp: timestamp };
@@ -135,15 +141,22 @@ Prober.prototype._addProbe = function addProbe(isOk) {
         if (logger) {
             logger.warn(this.title + ' has gotten sick');
         }
-        this.statsd.increment('prober.' + this.title + '.health.sick');
+        if (statsd) {
+            this.statsd.increment('prober.' + this.title + '.health.sick');
+        }
     } else if (!wasHealthy && isHealthy) {
         this.waitPeriod = this.defaultWaitPeriod;
         if (logger) {
             logger.warn(this.title + ' has returned to health');
         }
-        this.statsd.increment('prober.' + this.title + '.health.recovered');
+        if (statsd) {
+            this.statsd.increment('prober.' + this.title + '.health.recovered');
+        }
     } else if (!wasHealthy && !isHealthy) {
-        this.statsd.increment('prober.' + this.title + '.health.still-sick');
+        if (statsd) {
+            this.statsd.increment('prober.' + this.title +
+                '.health.still-sick');
+        }
 
         if (thisProbe.isOk) {
             this.waitPeriod /= 2;
