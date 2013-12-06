@@ -1,0 +1,28 @@
+{
+  "name": "airlock",
+  "version": "1.0.0",
+  "description": "A prober to probe HTTP based backends for health",
+  "keywords": [],
+  "author": "Uber Dev<dev@uber.com>",
+  "repository": "git://github.com/uber/airlock.git",
+  "main": "index",
+  "homepage": "https://github.com/uber/airlock",
+  "bugs": {
+    "url": "https://github.com/uber/airlock/issues",
+    "email": "raynos2@gmail.com"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "mocha": "~1.15.1"
+  },
+  "scripts": {
+    "test": "npm run jshint && mocha --reporter tap ./test 2>&1 | tee ./test/test.js.tap",
+    "jshint": "jshint --verbose .",
+    "cover": "istanbul cover --report none --print detail _mocha",
+    "view-cover": "istanbul report html && open ./coverage/index.html"
+  },
+  "engine": {
+    "node": "0.8.x"
+  },
+  "private": true
+}
