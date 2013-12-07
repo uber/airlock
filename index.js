@@ -4,7 +4,7 @@ function Prober(options) {
     this.window = options.window || 5;
     this.defaultWaitPeriod = options.defaultWaitPeriod || 1000;
     this.maxWaitPeriod = options.maxWaitPeriod || 60000;
-    this.enabled = options.enabled || false;
+    this.enabled = options.enabled || true;
     var detectFailuresBy = options.detectFailuresBy || Prober.detectBy.CALLBACK;
     this.detectFailuresByCallback =
         (detectFailuresBy === Prober.detectBy.CALLBACK) ||
