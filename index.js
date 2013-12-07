@@ -8,6 +8,7 @@ function Prober(options) {
     this.title = options.title || 'general';
     this.threshold = options.threshold || 3;
     this.window = options.window || 5;
+    this.now = options.now || Date.now;
     this.defaultWaitPeriod = options.defaultWaitPeriod || 1000;
     this.maxWaitPeriod = options.maxWaitPeriod || 60000;
     this.enabled = options.enabled || true;
@@ -23,7 +24,7 @@ function Prober(options) {
     this.logger = options.logger || null;
     this.probes = [];
     this.waitPeriod = this.defaultWaitPeriod;
-    this.lastBackendRequest = Date.now();
+    this.lastBackendRequest = this.now();
     this.statsd = options.statsd || null;
 
     if (this.detectFailuresByEvent) {
@@ -120,7 +121,7 @@ Prober.prototype.probe = function probe(request, bypass, callback) {
             });
         }
 
-        this.lastBackendRequest = Date.now();
+        this.lastBackendRequest = this.now();
     } else {
         if (this.statsd) {
             this.statsd.increment('prober.' + this.title + '.request.bypassed');
@@ -133,7 +134,7 @@ Prober.prototype.probe = function probe(request, bypass, callback) {
 };
 
 Prober.prototype._addProbe = function addProbe(isOk) {
-    var timestamp = Date.now();
+    var timestamp = this.now();
     var logger = this.logger;
     var statsd = this.statsd;
 
@@ -193,7 +194,7 @@ Prober.prototype._getOks = function _getOks() {
 };
 
 Prober.prototype._isPityProbe = function _isPityProbe() {
-    return this.lastBackendRequest && Date.now() >=
+    return this.lastBackendRequest && this.now() >=
         (this.lastBackendRequest + this.waitPeriod);
 };
 

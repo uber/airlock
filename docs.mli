@@ -24,6 +24,7 @@ rt-prober := ({
     backend: EventEmitter,
     failureEvent: String,
     successEvent: String,
+    now: () => Number,
     failureHandler: ({ subject: String, body: String }) => void,
     statsd: { increment: (String) => void }
 }) => Prober

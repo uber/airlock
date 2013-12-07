@@ -1,5 +1,5 @@
 var assert = require('assert');
-var sinon = require('sinon');
+var timer = require('time-mock');
 var times = require('lodash.times');
 var test = global.it;
 
@@ -142,9 +142,14 @@ test('should have default wait period after becoming sick', function(end) {
 });
 
 test('should allow backend request only after wait period', function(end) {
-    var prober = new Prober();
-    var probeSpy = sinon.spy();
-    var clock = sinon.useFakeTimers(Date.now());
+    // create a fake timer.
+    var clock = timer(Date.now());
+    var prober = new Prober({
+        // overwrite now to be a fake Date.now() based on our clock
+        now: clock.now
+    });
+    // var probeSpy = sinon.spy();
+    // var clock = sinon.useFakeTimers(Date.now());
 
     prober.waitPeriod = prober.maxWaitPeriod / 2;
 
@@ -158,14 +163,16 @@ test('should allow backend request only after wait period', function(end) {
     prober.probe(assert.fail);
 
     // Simulate time after wait period
-    clock.tick(prober.waitPeriod);
+    clock.advance(prober.waitPeriod);
 
-    prober.probe(probeSpy);
+    var called = false;
+    prober.probe(function () {
+        called = true;
+    });
 
     // Backend request was made
-    assert.ok(probeSpy.calledOnce);
+    assert.ok(called);
 
-    clock.restore();
     end();
 });
 
