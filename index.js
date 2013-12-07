@@ -1,4 +1,10 @@
 function Prober(options) {
+    if (!(this instanceof Prober)) {
+        return new Prober(options);
+    }
+
+    options = options || {};
+
     this.title = options.title || 'general';
     this.threshold = options.threshold || 3;
     this.window = options.window || 5;
