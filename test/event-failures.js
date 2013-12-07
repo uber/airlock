@@ -1,12 +1,14 @@
 var assert = require('assert');
-var sinon = require('sinon');
 var test = global.it;
 
 var Prober = require('../index');
 
 test('Prober detecting failures by event', function(end) {
+    var events = [];
     var mockEmitter = {
-        on: sinon.spy()
+        on: function (eventName) {
+            events.push(eventName);
+        }
     };
     var failureEvent = 'failureEvent';
     var successEvent = 'successEvent';
@@ -22,9 +24,8 @@ test('Prober detecting failures by event', function(end) {
         }
     });
 
-    assert(mockEmitter.on.calledTwice);
-    assert(mockEmitter.on.firstCall.calledWith(failureEvent));
-    assert(mockEmitter.on.secondCall.calledWith(successEvent));
+    assert.equal(events.length, 2);
+    assert.deepEqual(events, [failureEvent, successEvent]);
 
     // failures deteted by events do not have a callback
     // argument so calling it will throw and thus not trigger

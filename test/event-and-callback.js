@@ -1,10 +1,9 @@
 var assert = require('assert');
-var sinon = require('sinon');
 var test = global.it;
 
 var Prober = require('../index');
 
-test('Prober detecting failures by both callback and event', function() {
+test('Prober detecting failures by both callback and event', function(end) {
     var prober = new Prober({
         detectFailuresBy: Prober.detectBy.BOTH,
         backend: {
@@ -14,7 +13,10 @@ test('Prober detecting failures by both callback and event', function() {
         successEvent: ''
     });
 
-    var spy = sinon.spy();
-    prober.probe(function(callback) { callback(); }, assert.fail, spy);
-    assert.ok(spy.calledOnce);
+    var called = false;
+    prober.probe(function(callback) { callback(); }, assert.fail, function () {
+        called = true;
+    });
+    assert.ok(called);
+    end();
 });

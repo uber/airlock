@@ -14,8 +14,8 @@
   "dependencies": {},
   "devDependencies": {
     "mocha": "~1.15.1",
-    "sinon": "~1.7.3",
-    "lodash.times": "~2.4.1"
+    "lodash.times": "~2.4.1",
+    "time-mock": "~0.1.2"
   },
   "scripts": {
     "test": "npm run jshint && mocha --reporter tap ./test 2>&1 | tee ./test/test.js.tap",
