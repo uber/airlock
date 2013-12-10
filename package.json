@@ -1,6 +1,6 @@
 {
   "name": "airlock",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A prober to probe HTTP based backends for health",
   "keywords": [],
   "author": "Uber Dev<dev@uber.com>",
