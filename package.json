@@ -15,12 +15,13 @@
   "devDependencies": {
     "mocha": "~1.15.1",
     "lodash.times": "~2.4.1",
-    "time-mock": "~0.1.2"
+    "time-mock": "~0.1.2",
+    "istanbul": "~0.1.46"
   },
   "scripts": {
     "test": "npm run jshint && mocha --reporter tap ./test 2>&1 | tee ./test/test.js.tap",
     "jshint": "jshint --verbose .",
-    "cover": "istanbul cover --report none --print detail _mocha",
+    "cover": "istanbul cover --report none --print detail _mocha -- test --reporter tap",
     "view-cover": "istanbul report html && open ./coverage/index.html"
   },
   "engine": {
