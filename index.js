@@ -112,7 +112,7 @@ Prober.prototype.probe = function probe(request, bypass, callback) {
             request(wrappedCallback);
         } catch (e) {
             // we can't log the error here in case the prober is used
-            // within the loger. So instead we pass it to the failureHandler
+            // within the logger. So instead we pass it to the failureHandler
             // the user of this module should not log in the failureHandler
             // maybe send an email instead
             this.failureHandler({

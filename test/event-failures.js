@@ -27,7 +27,7 @@ test('Prober detecting failures by event', function(end) {
     assert.equal(events.length, 2);
     assert.deepEqual(events, [failureEvent, successEvent]);
 
-    // failures deteted by events do not have a callback
+    // failures detected by events do not have a callback
     // argument so calling it will throw and thus not trigger
     // the actual callback to probe.
     // instead we just do a side effect and the emitter will

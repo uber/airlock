@@ -148,8 +148,6 @@ test('should allow backend request only after wait period', function(end) {
         // overwrite now to be a fake Date.now() based on our clock
         now: clock.now
     });
-    // var probeSpy = sinon.spy();
-    // var clock = sinon.useFakeTimers(Date.now());
 
     prober.waitPeriod = prober.maxWaitPeriod / 2;
 
