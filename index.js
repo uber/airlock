@@ -79,6 +79,10 @@ Prober.prototype.setLogger = function setLogger(logger) {
 Prober.prototype.probe = function probe(request, bypass, callback) {
     var self = this;
 
+    if (!callback) {
+        callback = bypass;
+    }
+
     if (!this.enabled) {
         return request(callback);
     }
