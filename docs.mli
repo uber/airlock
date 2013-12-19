@@ -13,18 +13,17 @@ type Prober := {
 
 rt-prober := ({
     title: String,
-    threshold: Number,
-    window: Number,
-    defaultWaitPeriod: Number,
-    maxWaitPeriod: Number,
-    enabled: Boolean,
-    detectFailuresBy: 'event' | 'callback' | 'both',
-    statsd?: StatsdClient | null,
-    logger?: WinstonLoggerClient,
-    backend: EventEmitter,
-    failureEvent: String,
-    successEvent: String,
-    now: () => Number,
     failureHandler: ({ subject: String, body: String }) => void,
-    statsd: { increment: (String) => void }
+    statsd?: { increment: (String) => void },
+    threshold?: Number,
+    window?: Number,
+    defaultWaitPeriod?: Number,
+    maxWaitPeriod?: Number,
+    enabled?: Boolean,
+    detectFailuresBy?: 'event' | 'callback' | 'both',
+    logger?: WinstonLoggerClient,
+    backend?: EventEmitter,
+    failureEvent?: String,
+    successEvent?: String,
+    now?: () => Number
 }) => Prober
