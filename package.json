@@ -3,7 +3,7 @@
   "version": "1.0.3",
   "description": "A prober to probe HTTP based backends for health",
   "keywords": [],
-  "author": "Uber Dev<dev@uber.com>",
+  "author": "Raynos <raynos2@gmail.com>",
   "repository": "git://github.com/uber/airlock.git",
   "main": "index",
   "homepage": "https://github.com/uber/airlock",
@@ -11,6 +11,10 @@
     "url": "https://github.com/uber/airlock/issues",
     "email": "raynos2@gmail.com"
   },
+  "collaborators": [
+    { name: "jeff wolski" },
+    { name: "markyen" }
+  ],
   "dependencies": {},
   "devDependencies": {
     "mocha": "~1.15.1",

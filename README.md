@@ -45,5 +45,7 @@ prober.probe(thunk, function (err, res, body) {
 ## Contributors
 
  - Raynos
+ - markyen
+ - jwolski
 
 ## MIT Licenced
