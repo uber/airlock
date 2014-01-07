@@ -1,6 +1,6 @@
 {
   "name": "airlock",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A prober to probe HTTP based backends for health",
   "keywords": [],
   "author": "Raynos <raynos2@gmail.com>",
@@ -12,8 +12,12 @@
     "email": "raynos2@gmail.com"
   },
   "collaborators": [
-    { "name": "jeff wolski" },
-    { "name": "markyen" }
+    {
+      "name": "jeff wolski"
+    },
+    {
+      "name": "markyen"
+    }
   ],
   "dependencies": {},
   "devDependencies": {
