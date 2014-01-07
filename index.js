@@ -199,6 +199,8 @@ Prober.prototype._addProbe = function addProbe(isOk) {
                     'period to ' + this.waitPeriod + 'ms');
             }
         }
+    } else if (statsd) {
+        this.statsd.increment('prober.' + this.title + '.health.still-healthy');
     }
 };
 
