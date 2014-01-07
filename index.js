@@ -1,3 +1,11 @@
+var defaults = {
+    title: 'general',
+    threshold: 3,
+    window: 5,
+    defaultWaitPeriod: 1000,
+    maxWaitPeriod: 60 * 1000,
+};
+
 function Prober(options) {
     if (!(this instanceof Prober)) {
         return new Prober(options);
@@ -5,12 +13,13 @@ function Prober(options) {
 
     options = options || {};
 
-    this.title = options.title || 'general';
-    this.threshold = options.threshold || 3;
-    this.window = options.window || 5;
+    this.title = options.title || defaults.title;
+    this.threshold = options.threshold || defaults.threshold;
+    this.window = options.window || defaults.window;
     this.now = options.now || Date.now;
-    this.defaultWaitPeriod = options.defaultWaitPeriod || 1000;
-    this.maxWaitPeriod = options.maxWaitPeriod || 60000;
+    this.defaultWaitPeriod = options.defaultWaitPeriod ||
+        defaults.defaultWaitPeriod;
+    this.maxWaitPeriod = options.maxWaitPeriod || defaults.maxWaitPeriod;
     this.enabled = options.enabled || true;
     var detectFailuresBy = options.detectFailuresBy || Prober.detectBy.CALLBACK;
     this.detectFailuresByCallback =
