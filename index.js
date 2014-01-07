@@ -1,7 +1,7 @@
 var defaults = {
     title: 'general',
-    threshold: 3,
-    window: 5,
+    threshold: 6,
+    window: 10,
     defaultWaitPeriod: 1000,
     maxWaitPeriod: 60 * 1000,
 };
