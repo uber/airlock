@@ -149,7 +149,6 @@ Prober.prototype.probe = function probe(request, bypass, callback) {
 Prober.prototype._addProbe = function addProbe(isOk) {
     var timestamp = this.now();
     var logger = this.logger;
-    var statsd = this.statsd;
 
     var wasHealthy = this.isHealthy();
     var thisProbe = { isOk: isOk, timestamp: timestamp };
@@ -161,7 +160,7 @@ Prober.prototype._addProbe = function addProbe(isOk) {
         if (logger) {
             logger.warn(this.title + ' has gotten sick');
         }
-        if (statsd) {
+        if (this.statsd) {
             this.statsd.increment('prober.' + this.title + '.health.sick');
         }
     } else if (!wasHealthy && isHealthy) {
@@ -169,11 +168,11 @@ Prober.prototype._addProbe = function addProbe(isOk) {
         if (logger) {
             logger.warn(this.title + ' has returned to health');
         }
-        if (statsd) {
+        if (this.statsd) {
             this.statsd.increment('prober.' + this.title + '.health.recovered');
         }
     } else if (!wasHealthy && !isHealthy) {
-        if (statsd) {
+        if (this.statsd) {
             this.statsd.increment('prober.' + this.title +
                 '.health.still-sick');
         }
@@ -199,7 +198,7 @@ Prober.prototype._addProbe = function addProbe(isOk) {
                     'period to ' + this.waitPeriod + 'ms');
             }
         }
-    } else if (statsd) {
+    } else if (this.statsd) {
         this.statsd.increment('prober.' + this.title + '.health.still-healthy');
     }
 };
