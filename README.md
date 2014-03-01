@@ -38,6 +38,23 @@ prober.probe(thunk, function (err, res, body) {
 })
 ```
 
+## Options
+
+- title             default: `'general'`
+- threshold         default: `6`
+- window            default: `10`
+- now               default: `Date.now`
+- defaultWaitPeriod default: `1000`
+- maxWaitPeriod     default: `60 * 1000`
+- enabled           default: `true`
+- detectFailuresBy  default: `Prober.detectBy.CALLBACK`
+- failureHandler
+- logger
+- statsd
+- backend
+- failureEvent
+- successEvent
+
 ## Installation
 
 `npm install airlock`
