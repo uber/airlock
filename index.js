@@ -96,7 +96,7 @@ Prober.prototype.wrapCallback = function(callback) {
             self.ok();
         }
         if (callback && typeof callback === 'function') {
-            callback.apply(null, arguments);
+            callback.apply(this, arguments);
         }
     };
 };
