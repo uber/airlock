@@ -85,6 +85,22 @@ Prober.prototype.setLogger = function setLogger(logger) {
     this.logger = logger;
 };
 
+Prober.prototype.wrapCallback = function(callback) {
+    var self = this;
+    return function(err, resp) {
+        var errResponse = resp && !isNaN(resp.statusCode) &&
+            resp.statusCode >= 500;
+        if (err || errResponse) {
+            self.notok();
+        } else {
+            self.ok();
+        }
+        if (callback && typeof callback === 'function') {
+            callback.apply(null, arguments);
+        }
+    };
+};
+
 Prober.prototype.probe = function probe(request, bypass, callback) {
     var self = this;
 
@@ -105,24 +121,12 @@ Prober.prototype.probe = function probe(request, bypass, callback) {
                 '.request.performed');
         }
 
-        var wrappedCallback;
         if (this.detectFailuresByCallback) {
-            wrappedCallback = function(err, resp) {
-                var errResponse = resp && !isNaN(resp.statusCode) &&
-                    resp.statusCode >= 500;
-                if (err || errResponse) {
-                    self.notok();
-                } else {
-                    self.ok();
-                }
-
-                if (callback && typeof callback === 'function') {
-                    callback.apply(null, arguments);
-                }
-            };
+            callback = self.wrapCallback(callback);
         }
+
         try {
-            request(wrappedCallback);
+            request(callback);
         } catch (e) {
             // we can't log the error here in case the prober is used
             // within the logger. So instead we pass it to the failureHandler
