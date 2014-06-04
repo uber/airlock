@@ -121,9 +121,15 @@ Prober.prototype.probe = function probe(request, bypass, callback) {
             };
         }
 
-        this.lastBackendRequest = this.now();
+        try {
+            request(wrappedCallback);
+            this.lastBackendRequest = this.now();
+        } catch (err) {
+            this.lastBackendRequest = this.now();
+            this.notok();
 
-        request(wrappedCallback);
+            throw err;
+        }
     } else {
         if (this.statsd) {
             this.statsd.increment('prober.' + this.title + '.request.bypassed');
