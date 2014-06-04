@@ -29,7 +29,6 @@ function Prober(options) {
         (detectFailuresBy === Prober.detectBy.EVENT) ||
         (detectFailuresBy === Prober.detectBy.BOTH);
 
-    this.failureHandler = options.failureHandler;
     this.logger = options.logger || null;
     this.probes = [];
     this.waitPeriod = this.defaultWaitPeriod;

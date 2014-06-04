@@ -9,12 +9,6 @@ var Prober = require("airlock")
 
 var prober = new Prober({
     title: 'probe interface',
-    failureHandler: function (opts) {
-        /* prober failed to probe a thunk.
-            handle this case somehow, maybe send email or log
-            to a known working logger.
-        */
-    },
     statsd: { increment: function (key) {
         // send increment command to a statsd server.
     } },
