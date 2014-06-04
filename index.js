@@ -121,20 +121,10 @@ Prober.prototype.probe = function probe(request, bypass, callback) {
                 }
             };
         }
-        try {
-            request(wrappedCallback);
-        } catch (e) {
-            // we can't log the error here in case the prober is used
-            // within the logger. So instead we pass it to the failureHandler
-            // the user of this module should not log in the failureHandler
-            // maybe send an email instead
-            this.failureHandler({
-                subject: "Exception in Prober while probing " + this.title,
-                body: e.stack
-            });
-        }
 
         this.lastBackendRequest = this.now();
+
+        request(wrappedCallback);
     } else {
         if (this.statsd) {
             this.statsd.increment('prober.' + this.title + '.request.bypassed');
