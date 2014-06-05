@@ -13,7 +13,6 @@ type Prober := {
 
 rt-prober := ({
     title: String,
-    failureHandler: ({ subject: String, body: String }) => void,
     statsd?: { increment: (String) => void },
     threshold?: Number,
     window?: Number,
