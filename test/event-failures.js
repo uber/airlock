@@ -12,16 +12,13 @@ test('Prober detecting failures by event', function(end) {
     };
     var failureEvent = 'failureEvent';
     var successEvent = 'successEvent';
-    var failed = false;
 
     var prober = new Prober({
         detectFailuresBy: Prober.detectBy.EVENT,
         backend: mockEmitter,
+        window: 1,
         failureEvent: failureEvent,
-        successEvent: successEvent,
-        failureHandler: function () {
-            failed = true;
-        }
+        successEvent: successEvent
     });
 
     assert.equal(events.length, 2);
@@ -32,9 +29,12 @@ test('Prober detecting failures by event', function(end) {
     // the actual callback to probe.
     // instead we just do a side effect and the emitter will
     // emit success & failure events which get probed
-    prober.probe(function(callback) {
-        callback();
-    }, assert.fail, assert.fail);
-    assert.ok(failed);
+    try {
+        prober.probe(function(callback) {
+            callback();
+        }, assert.fail, assert.fail);
+    } catch (err) { /*ignore*/ }
+
+    assert.ok(!prober.isHealthy());
     end();
 });

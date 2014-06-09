@@ -20,7 +20,7 @@ function Prober(options) {
     this.defaultWaitPeriod = options.defaultWaitPeriod ||
         defaults.defaultWaitPeriod;
     this.maxWaitPeriod = options.maxWaitPeriod || defaults.maxWaitPeriod;
-    this.enabled = options.enabled || true;
+    this.enabled = 'enabled' in options ? options.enabled : true;
     var detectFailuresBy = options.detectFailuresBy || Prober.detectBy.CALLBACK;
     this.detectFailuresByCallback =
         (detectFailuresBy === Prober.detectBy.CALLBACK) ||
