@@ -18,6 +18,14 @@ test('Prober should make request with no previous probes', function(end) {
     end();
 });
 
+test('can disabled prober', function (end) {
+    var prober = new Prober({ enabled: false });
+
+    assert.equal(prober.enabled, false);
+
+    end();
+});
+
 test('Prober should make request when amount of healthy probes are less than window', function(end) {
     var prober = new Prober();
     times(prober.threshold, function() { prober.ok(); });
