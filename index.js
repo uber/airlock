@@ -65,6 +65,10 @@ Prober.prototype.isSick = function isSick() {
 };
 
 Prober.prototype.notok = function notok() {
+    if (!this.enabled) {
+        return;
+    }
+
     this._addProbe(false);
     if (this.statsd) {
         this.statsd.increment('prober.' + this.title + '.probe.notok');
@@ -74,6 +78,10 @@ Prober.prototype.notok = function notok() {
 Prober.prototype.notOk = Prober.prototype.notok;
 
 Prober.prototype.ok = function ok() {
+    if (!this.enabled) {
+        return;
+    }
+
     this._addProbe(true);
     if (this.statsd) {
         this.statsd.increment('prober.' + this.title + '.probe.ok');
@@ -91,6 +99,31 @@ Prober.prototype.probe = function probe(request, bypass, callback) {
         callback = bypass;
     }
 
+    var wrappedCallback;
+    if (this.detectFailuresByCallback) {
+        wrappedCallback = function(err, resp) {
+            var errResponse = resp && !isNaN(resp.statusCode) &&
+                resp.statusCode >= 500;
+            if (err || errResponse) {
+                self.notok();
+            } else {
+                self.ok();
+            }
+
+            if (callback && typeof callback === 'function') {
+                callback.apply(null, arguments);
+            }
+        };
+    }
+
+    this.customProbe(request, bypass, wrappedCallback);
+};
+
+Prober.prototype.customProbe = function probe(request, bypass, callback) {
+    if (!callback) {
+        callback = bypass;
+    }
+
     if (!this.enabled) {
         return request(callback);
     }
@@ -104,25 +137,8 @@ Prober.prototype.probe = function probe(request, bypass, callback) {
                 '.request.performed');
         }
 
-        var wrappedCallback;
-        if (this.detectFailuresByCallback) {
-            wrappedCallback = function(err, resp) {
-                var errResponse = resp && !isNaN(resp.statusCode) &&
-                    resp.statusCode >= 500;
-                if (err || errResponse) {
-                    self.notok();
-                } else {
-                    self.ok();
-                }
-
-                if (callback && typeof callback === 'function') {
-                    callback.apply(null, arguments);
-                }
-            };
-        }
-
         try {
-            request(wrappedCallback);
+            request(callback);
             this.lastBackendRequest = this.now();
         } catch (err) {
             this.lastBackendRequest = this.now();

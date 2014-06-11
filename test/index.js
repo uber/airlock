@@ -226,4 +226,18 @@ test('should be healthy after request client err', function(end) {
 });
 
 
+test('should be healthy after custom handling expected error', function(end) {
+    var prober = new Prober();
+    prober.threshold = 1;
+    prober.window = 1;
+
+    prober.customProbe(function(fn) {
+        fn(new Error('Some kind of bad going on'));
+    }, function() {
+        prober.ok();
+    });
+
+    assert.ok(prober.isHealthy());
+    end();
+});
 
