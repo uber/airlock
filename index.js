@@ -1,3 +1,5 @@
+var BitRing = require('./bit-ring');
+
 var defaults = {
     title: 'general',
     threshold: 6,
@@ -30,7 +32,7 @@ function Prober(options) {
         (detectFailuresBy === Prober.detectBy.BOTH);
 
     this.logger = options.logger || null;
-    this.probes = [];
+    this.bitRing = new BitRing(this.window);
     this.waitPeriod = this.defaultWaitPeriod;
     this.lastBackendRequest = this.now();
     this.statsd = options.statsd || null;
@@ -55,9 +57,9 @@ Prober.detectBy = {
     BOTH: 'both'
 };
 
-Prober.prototype.isHealthy = function isHealth() {
-    return this.probes.length < this.window ||
-        this._getOks().length >= this.threshold;
+Prober.prototype.isHealthy = function isHealthy() {
+    return this.bitRing.length < this.window ||
+        this.bitRing.count() >= this.threshold;
 };
 
 Prober.prototype.isSick = function isSick() {
@@ -158,14 +160,11 @@ Prober.prototype.customProbe = function probe(request, bypass, callback) {
 };
 
 Prober.prototype._addProbe = function addProbe(isOk) {
-    var timestamp = this.now();
     var logger = this.logger;
     var statsd = this.statsd;
 
     var wasHealthy = this.isHealthy();
-    var thisProbe = { isOk: isOk, timestamp: timestamp };
-    this.probes.unshift(thisProbe);
-    this.probes = this.probes.slice(0, this.window);
+    this.bitRing.push(isOk);
     var isHealthy = this.isHealthy();
 
     if (wasHealthy && !isHealthy) {
@@ -189,7 +188,7 @@ Prober.prototype._addProbe = function addProbe(isOk) {
                 '.health.still-sick');
         }
 
-        if (thisProbe.isOk) {
+        if (isOk) {
             this.waitPeriod /= 2;
             if (logger) {
                 logger.warn(this.title + ' is still sick but last probe was ' +
@@ -213,10 +212,6 @@ Prober.prototype._addProbe = function addProbe(isOk) {
     } else if (statsd) {
         this.statsd.increment('prober.' + this.title + '.health.still-healthy');
     }
-};
-
-Prober.prototype._getOks = function _getOks() {
-    return this.probes.filter(function(probe) { return probe.isOk; });
 };
 
 Prober.prototype._isPityProbe = function _isPityProbe() {
