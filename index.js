@@ -77,6 +77,12 @@ Prober.prototype.notok = function notok() {
     }
 };
 
+Prober.prototype.setEnabled = function setEnabled(enabled) {
+    if (typeof enabled === 'boolean') {
+        this.enabled = enabled;
+    }
+};
+
 Prober.prototype.notOk = Prober.prototype.notok;
 
 Prober.prototype.ok = function ok() {

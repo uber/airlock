@@ -26,6 +26,18 @@ test('can disabled prober', function (end) {
     end();
 });
 
+test.only('can reset to enable or disable prober', function(end) {
+    var prober = new Prober();
+    assert.equal(prober.enabled, true);
+    prober.setEnabled(false);
+    assert.equal(prober.enabled, false);
+    prober.setEnabled("true");
+    assert.equal(prober.enabled, false);
+    prober.setEnabled(true);
+    assert.equal(prober.enabled, true);
+    end();
+});
+
 test('Prober should make request when amount of healthy probes are less than window', function(end) {
     var prober = new Prober();
     times(prober.threshold, function() { prober.ok(); });
