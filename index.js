@@ -1,3 +1,4 @@
+var assert = require('assert');
 var BitRing = require('./bit-ring');
 
 var defaults = {
@@ -75,6 +76,11 @@ Prober.prototype.notok = function notok() {
     if (this.statsd) {
         this.statsd.increment('prober.' + this.title + '.probe.notok');
     }
+};
+
+Prober.prototype.setEnabled = function setEnabled(enabled) {
+    assert(typeof enabled === 'boolean', 'setEnabled() takes a boolean');
+    this.enabled = enabled;
 };
 
 Prober.prototype.notOk = Prober.prototype.notok;
