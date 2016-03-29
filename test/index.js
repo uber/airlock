@@ -26,13 +26,17 @@ test('can disabled prober', function (end) {
     end();
 });
 
-test.only('can reset to enable or disable prober', function(end) {
+test('can reset to enable or disable prober', function(end) {
     var prober = new Prober();
     assert.equal(prober.enabled, true);
     prober.setEnabled(false);
     assert.equal(prober.enabled, false);
-    prober.setEnabled("true");
-    assert.equal(prober.enabled, false);
+    try {
+        prober.setEnabled("false");
+    } catch(e) {
+        assert(e.name === 'AssertionError');
+        assert.equal(prober.enabled, false);
+    }
     prober.setEnabled(true);
     assert.equal(prober.enabled, true);
     end();
