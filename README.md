@@ -1,6 +1,6 @@
 # airlock
 
-A prober to probe HTTP based backends for health
+A prober to probe HTTP, [tchannel](https://github.com/uber/tchannel), or potentially other protocols based backends for health
 
 ## Example
 

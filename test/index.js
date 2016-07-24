@@ -5,6 +5,27 @@ var test = global.it;
 
 var Prober = require('../index');
 
+var exampleTchannelIsUnhealthyFunc = function isUnhealthy(err, resp) {
+    if (err) {
+        // not an exhaustive list, just an example
+        var serverErrTypes = [
+            'tchannel.request.timeout',
+            'tchannel.connection.close',
+            'tchannel.connection.reset',
+            'tchannel.connection.unknown-reset'
+        ];
+        return serverErrTypes.indexOf(err.type) !== -1;
+    }
+    if (resp) {
+        // not an exhaustive list, just an example
+        var respServerErrTypes = [
+            'tchannel.busy'
+        ];
+        return resp.ok === false && respServerErrTypes.indexOf(resp.type) !== -1;
+    }
+    return false;
+};
+
 test('Prober is a function', function (end) {
     assert.equal(typeof Prober, 'function');
     end();
@@ -211,7 +232,7 @@ test('should be unhealthy after request err', function(end) {
     end();
 });
 
-test('should be unhealthy after request server err', function(end) {
+test('should be unhealthy after HTTP request server err', function(end) {
     var prober = new Prober();
     prober.threshold = 1;
     prober.window = 1;
@@ -226,7 +247,7 @@ test('should be unhealthy after request server err', function(end) {
     end();
 });
 
-test('should be healthy after request client err', function(end) {
+test('should be healthy after HTTP request client err', function(end) {
     var prober = new Prober();
     prober.threshold = 1;
     prober.window = 1;
@@ -241,6 +262,53 @@ test('should be healthy after request client err', function(end) {
     end();
 });
 
+test('should be healthy after tchannel request server success', function(end) {
+    var prober = new Prober();
+    prober.threshold = 1;
+    prober.window = 1;
+    prober.isUnhealthyFunc = exampleTchannelIsUnhealthyFunc;
+
+    prober.probe(function(fn) {
+        fn(null, {
+            ok: true,
+            body: {}
+        });
+    });
+
+    assert.ok(prober.isHealthy());
+    end();
+});
+
+test('should be unhealthy after tchannel request server err', function(end) {
+    var prober = new Prober();
+    prober.threshold = 1;
+    prober.window = 1;
+    prober.isUnhealthyFunc = exampleTchannelIsUnhealthyFunc;
+
+    prober.probe(function(fn) {
+        fn({ type: 'tchannel.request.timeout' });
+    });
+
+    assert.ok(prober.isSick());
+    end();
+});
+
+test('should be unhealthy after tchannel request server err from resp', function(end) {
+    var prober = new Prober();
+    prober.threshold = 1;
+    prober.window = 1;
+    prober.isUnhealthyFunc = exampleTchannelIsUnhealthyFunc;
+
+    prober.probe(function(fn) {
+        fn(null, {
+            ok: false,
+            type: 'tchannel.busy'
+        });
+    });
+
+    assert.ok(prober.isSick());
+    end();
+});
 
 test('should be healthy after custom handling expected error', function(end) {
     var prober = new Prober();

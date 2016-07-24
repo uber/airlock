@@ -7,6 +7,10 @@ var defaults = {
     window: 10,
     defaultWaitPeriod: 1000,
     maxWaitPeriod: 60 * 1000,
+    isUnhealthyFunc: function isUnhealthy(err, resp) {
+        // default is for HTTP, tchannel/other protocal needs to pass in different function
+        return err || resp && !isNaN(resp.statusCode) && resp.statusCode >= 500;
+    }
 };
 
 function Prober(options) {
@@ -37,6 +41,9 @@ function Prober(options) {
     this.waitPeriod = this.defaultWaitPeriod;
     this.lastBackendRequest = this.now();
     this.statsd = options.statsd || null;
+
+    this.isUnhealthyFunc = typeof options.isUnhealthyFunc === 'function' ||
+        defaults.isUnhealthyFunc;
 
     if (this.detectFailuresByEvent) {
         if (!options.backend) {
@@ -110,9 +117,7 @@ Prober.prototype.probe = function probe(request, bypass, callback) {
     var wrappedCallback;
     if (this.detectFailuresByCallback) {
         wrappedCallback = function(err, resp) {
-            var errResponse = resp && !isNaN(resp.statusCode) &&
-                resp.statusCode >= 500;
-            if (err || errResponse) {
+            if (self.isUnhealthyFunc(err, resp)) {
                 self.notok();
             } else {
                 self.ok();
