@@ -81,6 +81,7 @@ Prober.prototype.notok = function notok() {
 
     this._addProbe(false);
     if (this.statsd) {
+        this.logger.info('ZJ probe.notok');
         this.statsd.increment('prober.' + this.title + '.probe.notok');
     }
 };
@@ -99,6 +100,7 @@ Prober.prototype.ok = function ok() {
 
     this._addProbe(true);
     if (this.statsd) {
+        this.logger.info('ZJ probe.ok');
         this.statsd.increment('prober.' + this.title + '.probe.ok');
     }
 };
@@ -114,6 +116,14 @@ Prober.prototype.probe = function probe(request, bypass, callback) {
         callback = bypass;
     }
 
+    if (Math.random() < 0.02) {
+        self.logger.info('ZJ request bypass callback', {
+            request: request,
+            bypass: bypass,
+            callback: callback
+        });
+    }
+
     var wrappedCallback;
     if (this.detectFailuresByCallback) {
         wrappedCallback = function(err, resp) {
@@ -124,6 +134,9 @@ Prober.prototype.probe = function probe(request, bypass, callback) {
             }
 
             if (callback && typeof callback === 'function') {
+                self.logger.info('ZJ calling callback with arguments', {
+                    args: arguments
+                });
                 callback.apply(null, arguments);
             }
         };
@@ -150,21 +163,31 @@ Prober.prototype.customProbe = function probe(request, bypass, callback) {
                 '.request.performed');
         }
 
+        this.logger.info('ZJ healthy or pity', {
+            isPity: this._isPityProbe(),
+            isHealthy: this.isHealthy()
+        });
+
         try {
             request(callback);
             this.lastBackendRequest = this.now();
+            this.logger.info('ZJ requested successfully');
         } catch (err) {
             this.lastBackendRequest = this.now();
             this.notok();
 
+            this.logger.info('ZJ requested unsuccessfully', {
+                err: err
+            });
             throw err;
         }
     } else {
         if (this.statsd) {
             this.statsd.increment('prober.' + this.title + '.request.bypassed');
         }
-
+        this.logger.info('ZJ request bypassed');
         if (bypass && typeof bypass === 'function') {
+            this.logger.info('ZJ calling bypass');
             bypass(new Error(this.title + ' backend is unhealthy'));
         }
     }
@@ -177,6 +200,12 @@ Prober.prototype._addProbe = function addProbe(isOk) {
     var wasHealthy = this.isHealthy();
     this.bitRing.push(isOk);
     var isHealthy = this.isHealthy();
+
+    logger.info('ZJ adding probe', {
+        isOk: isOk,
+        wasHealthy: wasHealthy,
+        isHealthy: isHealthy
+    });
 
     if (wasHealthy && !isHealthy) {
         if (logger) {
