@@ -263,10 +263,11 @@ test('should be healthy after HTTP request client err', function(end) {
 });
 
 test('should be healthy after tchannel request server success', function(end) {
-    var prober = new Prober();
-    prober.threshold = 1;
-    prober.window = 1;
-    prober.isUnhealthyFunc = exampleTchannelIsUnhealthyFunc;
+    var prober = new Prober({
+        threshold: 1,
+        window: 1,
+        isUnhealthyFunc: exampleTchannelIsUnhealthyFunc
+    });
 
     prober.probe(function(fn) {
         fn(null, {
@@ -280,10 +281,11 @@ test('should be healthy after tchannel request server success', function(end) {
 });
 
 test('should be unhealthy after tchannel request server err', function(end) {
-    var prober = new Prober();
-    prober.threshold = 1;
-    prober.window = 1;
-    prober.isUnhealthyFunc = exampleTchannelIsUnhealthyFunc;
+    var prober = new Prober({
+        threshold: 1,
+        window: 1,
+        isUnhealthyFunc: exampleTchannelIsUnhealthyFunc
+    });
 
     prober.probe(function(fn) {
         fn({ type: 'tchannel.request.timeout' });
@@ -294,10 +296,11 @@ test('should be unhealthy after tchannel request server err', function(end) {
 });
 
 test('should be unhealthy after tchannel request server err from resp', function(end) {
-    var prober = new Prober();
-    prober.threshold = 1;
-    prober.window = 1;
-    prober.isUnhealthyFunc = exampleTchannelIsUnhealthyFunc;
+    var prober = new Prober({
+        threshold: 1,
+        window: 1,
+        isUnhealthyFunc: exampleTchannelIsUnhealthyFunc
+    });
 
     prober.probe(function(fn) {
         fn(null, {

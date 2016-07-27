@@ -42,8 +42,8 @@ function Prober(options) {
     this.lastBackendRequest = this.now();
     this.statsd = options.statsd || null;
 
-    this.isUnhealthyFunc = typeof options.isUnhealthyFunc === 'function' ||
-        defaults.isUnhealthyFunc;
+    this.isUnhealthyFunc = typeof options.isUnhealthyFunc === 'function' &&
+        options.isUnhealthyFunc || defaults.isUnhealthyFunc;
 
     if (this.detectFailuresByEvent) {
         if (!options.backend) {
