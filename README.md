@@ -41,5 +41,6 @@ prober.probe(thunk, function (err, res, body) {
  - Raynos
  - markyen
  - jwolski
+ - zhijinli
 
 ## MIT Licenced
